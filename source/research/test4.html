@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Untitled</title>
+</head>
+
+<body>
+
+
+<script type="text/javascript">
+//This Function sets up the XML/HTTP Request object - Used to retrieve content.
+function GetHttpReqObj() {
+	var xmlHttp = false; 
+	
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		try { 
+			xmlHttp = new XMLHttpRequest(); 
+		} catch (e) { 
+			xmlHttp = false; 
+		} 
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML3.XMLHTTP", "MSXML2.XMLHTTP", "MSXML.XMLHTTP", "Microsoft.XMLHTTP"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlHttp = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+			
+	}
+
+	xmlHttp.onreadystatechange = HandleReadyStateChange; 
+
+	return xmlHttp; 
+}
+
+//As soon as the document is loaded, this will load it into the global xmlDoc.
+function HandleReadyStateChange() {
+	//It is here that any wait crap would happen - setTimeout Stuff...
+	if(httpReq.readyState == 4) { 
+		//Loaded!  Pass on and build DOM
+		xmlDoc = ParseIntoXml(httpReq.responseText);
+	}
+}
+
+//This function sets up what to use to parse the XML.
+function GetXMLParser() {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlParser = new DOMParser();
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML4.DOMDocument", "MSXML3.DOMDocument", "MSXML2.DOMDocument", "MSXML.DOMDocument", "Microsoft.XmlDom"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlParser = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+		xmlParser.async = false; //Enforce download of XML file first. IE only.
+	}
+	
+	return xmlParser;
+}
+
+//This function parses the retrieved document into the xml tree.
+function ParseIntoXml(strXML) {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlDoc = xmlParser.parseFromString(strXML, "text/xml");
+		return xmlDoc;
+
+	} else if(window.ActiveXObject) { //Check for IE
+		xmlParser.loadXML(strXML);
+		return xmlParser;
+	}
+	
+}
+
+
+function TestMe() {
+	//alert(httpReq.responseText);
+	var configData = null;
+	
+	try {
+		//alert(xmlDoc.getElementById("configData").innerHTML);
+		//alert(xmlDoc.getElementById("content").innerHTML);
+		configData = xmlDoc.getElementById("configData");
+		
+		//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+		for (var i = 0; i < configData.childNodes.length; i++) {
+			if(configData.childNodes[i].nodeType == 3) { // && (!notWhitespace.test(configData.childNodes[i].nodeValue))) {
+				// that is, if it's a whitespace text node
+				configData.removeChild(configData.childNodes[i]);
+				i--;
+			}
+		}
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert(configData.childNodes[i].innerHTML);
+		}
+	} catch(e) {
+		//Dear Bill Gates : FUCK YOU!!!  Thanks, irritated Web Devoloper...
+		//alert(xmlDoc.getElementsByTagName("body")[0].childNodes[0].xml);
+		//alert(xmlDoc.getElementsByTagName("body")[0].childNodes[1].xml);
+		configData = xmlDoc.getElementsByTagName("body")[0].childNodes[0];
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert(configData.childNodes[i].xml);
+		}
+	}
+}
+
+//var xmlObj = new XmlObj();
+var httpReq = new GetHttpReqObj();
+var xmlParser = new GetXMLParser();
+var xmlDoc = null;
+
+//xmlDoc.GetXML = new function(url) { xmlDoc.open("GET", url, true); http.send(null);	}
+httpReq.open("GET", "home.html", true); 
+httpReq.send(null);
+
+
+</script>
+
+<a href="JavaScript:LoadXMLDoc()">Load It</a><br />
+<a href="JavaScript:TestMe()">Test It</a><br />
+
+
+</body>
+</html>

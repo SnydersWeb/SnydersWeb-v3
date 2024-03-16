@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Untitled</title>
+</head>
+
+<body>
+
+
+<script type="text/javascript">
+//This Function sets up the XML/HTTP Request object - Used to retrieve content.
+function GetHttpReqObj() {
+	var xmlHttp = false; 
+	
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		try { 
+			xmlHttp = new XMLHttpRequest(); 
+		} catch (e) { 
+			xmlHttp = false; 
+		} 
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML3.XMLHTTP", "MSXML2.XMLHTTP", "MSXML.XMLHTTP", "Microsoft.XMLHTTP"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlHttp = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+			
+	}
+
+
+	return xmlHttp; 
+}
+
+//As soon as the document is loaded, this will load it into the global xmlDoc.
+function HandleReadyStateChange() {
+	if(httpReq.readyState == 4) { 
+		//Loaded!  Pass on and build DOM
+		xmlDoc = ParseIntoXml(httpReq.responseText);
+		
+		//This would be a the place for the setTimeout wait animation termination.
+		alert("Document Loaded");
+	}
+}
+
+//This function sets up what to use to parse the XML.
+function GetXMLParser() {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlParser = new DOMParser();
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML4.DOMDocument", "MSXML3.DOMDocument", "MSXML2.DOMDocument", "MSXML.DOMDocument", "Microsoft.XmlDom"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlParser = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+		xmlParser.async = false; //Enforce download of XML file first. IE only.
+	}
+	
+	return xmlParser;
+}
+
+//This function parses the retrieved document into the xml tree.
+function ParseIntoXml(strXML) {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlDoc = xmlParser.parseFromString(strXML, "text/xml");
+		return xmlDoc;
+
+	} else if(window.ActiveXObject) { //Check for IE
+		xmlParser.loadXML(strXML);
+		return xmlParser;
+	}
+	
+}
+
+//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+function RemoveBadNodes(xmlDocPart) {
+	for (var i = 0; i < xmlDocPart.childNodes.length; i++) {
+		if(xmlDocPart.childNodes[i].nodeType != 1) { // == 3 && (!notWhitespace.test(xmlDocPart.childNodes[i].nodeValue))) {
+			// that is, if it's a whitespace text node
+			xmlDocPart.removeChild(xmlDocPart.childNodes[i]);
+			i--;
+		}
+	}
+	
+	return xmlDocPart;
+}
+
+//This function loads the XML Document
+function GetExternalDocument(xmlDocFileName) {
+	//This would be where the begin getXML process would start.
+	httpReq.open("GET", xmlDocFileName, true); 
+	httpReq.onreadystatechange = HandleReadyStateChange; 
+	httpReq.send(null);
+
+}
+
+function TestMe() {
+	//alert(httpReq.responseText);
+	var configData = null;
+	
+	try {
+		//This top method works in Mozilla 
+		configData = xmlDoc.getElementById("unSelectedBarArea");
+		
+		//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+		RemoveBadNodes(configData);
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert("ID:" + configData.childNodes[i].id + "\n\n" + configData.childNodes[i].innerHTML);
+			try {
+				RemoveBadNodes(configData.childNodes[i]);
+				for(var j = 0; j < configData.childNodes[i].childNodes.length; j++) {
+					alert("innerHTML: " + j + " " + configData.childNodes[i].childNodes[j].nodeType + "\n" + configData.childNodes[i].childNodes[j].innerHTML);  
+					
+				}
+			} catch(err) {
+				alert("Barf!");
+			}
+		}
+	} catch(e) {
+		//The method below is what IE must use to get to indidividual nodes.  
+		
+		configData = xmlDoc.nodeFromID("unSelectedBarArea");
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert("ID:" + configData.childNodes[i].getAttribute("id") + "\n\n" + configData.childNodes[i].xml);
+			try {
+				RemoveBadNodes(configData.childNodes[i]);
+				for(var j = 0; j < configData.childNodes[i].childNodes.length; j++) {
+					alert("innerHTML: " + j + " " + configData.childNodes[i].childNodes[j].nodeType + "\n" + configData.childNodes[i].childNodes[j].xml);  
+					
+				}
+			} catch(err) {
+				alert("Barf!");
+			}
+		}
+	}
+}
+
+function FillContent() {
+	try {
+		//Test code to change all links
+		try {
+			for(var i = 0; xmlDoc.getElementById("content").getElementsByTagName("a").length; i++) {
+				xmlDoc.getElementById("content").getElementsByTagName("a")[i].href = "changed!:" + xmlDoc.getElementById("content").getElementsByTagName("a")[i].href;
+			}
+		} catch(e) {
+			alert(e);
+		}
+		
+		//This actually fills content
+		document.getElementById("contentDiv").innerHTML = xmlDoc.getElementById("content").innerHTML;
+
+	} catch(e) {
+		//var test = xmlDoc.getNamedItem("content");
+		//alert(test);
+
+		//Test code to change all links
+		try {
+			for(var i = 0; xmlDoc.nodeFromID("content").getElementsByTagName("a").length; i++) {
+				//alert("Changing:\n " + xmlDoc.getElementsByTagName("body")[0].childNodes[4].childNodes[10].childNodes[1].getElementsByTagName("a")[i].getAttribute("href"));
+				xmlDoc.nodeFromID("content").getElementsByTagName("a")[i].setAttribute("href","changed!:" + xmlDoc.nodeFromID("content").getElementsByTagName("a")[i].getAttribute("href"));
+			}
+		} catch(e) {
+			alert(e.description);
+		}
+		
+		//This actually fills content
+		document.getElementById("contentDiv").innerHTML = xmlDoc.nodeFromID("content").xml; //"Bill Gates sucks my balls";
+	}		
+}
+
+//var xmlObj = new XmlObj();
+var httpReq = new GetHttpReqObj();
+var xmlParser = new GetXMLParser();
+var xmlDoc = null;
+
+//xmlDoc.GetXML = new function(url) { xmlDoc.open("GET", url, true); http.send(null);	}
+
+function GrabScript(scriptSrc) {
+	newScript = document.body.appendChild(document.createElement("script"));
+	newScript.type = "text/javascript";
+	newScript.src = scriptSrc;
+}
+
+alert("XML Check:\n" + "Requestor:" + httpReq + "\nParser:" + xmlParser);
+
+</script>
+
+<a href="JavaScript:GetExternalDocument('index.html')">Load It</a><br />
+<a href="JavaScript:GetExternalDocument('home.html')">Load It2</a><br />
+<a href="JavaScript:TestMe()">Test It</a><br />
+<a href="JavaScript:FillContent()">Fill Content</a><br /><br />
+<a href="JavaScript:GrabScript('scriptA.js')">Grab Script A</a><br />
+<a href="JavaScript:GrabScript('scriptB.js')">Grab Script B</a><br />
+<a href="JavaScript:TestFunction()">Test Grabbed Script</a><br />
+
+
+<div id="contentDiv">
+First Text
+</div>
+
+</body>
+</html>

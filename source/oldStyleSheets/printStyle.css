@@ -1,0 +1,587 @@
+@media print { 
+	/* Begin Tag Level Selctors */
+	BODY {
+		background-color : #FFFFFF;
+		border : none;
+		margin : auto;
+		margin-left : auto;
+		margin-right : auto;
+		margin-top : auto;
+		margin-bottom : auto;
+		overflow : visible;
+	}
+	
+	DIV {
+		border : 0px none;
+		margin : auto;
+	}
+	
+	HR {
+		color : #49EC2D;
+	}
+
+	IMG, IMG.A {
+		border : 0px none;
+		margin : auto;
+	}
+	
+	FORM {
+		border-collapse : collapse;
+		border : 0px none;
+		margin : auto;
+	}
+	
+	FIELDSET {
+		margin : 1px 1px 1px 1px;
+		padding : 4px 4px 4px 4px;
+		border : 1px solid #666666;
+		width : auto;
+		height : auto;
+	}
+	
+	LEGEND {
+		color : #000000; 
+		font-size : 12pt;
+	}
+	
+	LABEL {
+		position : static;
+		float : left;
+		width : 15em;
+		height : 2em;
+		text-align : right;
+	}
+	
+	INPUT, TEXTAREA, SELECT {
+		color : #000000;
+		background-color : #000000;
+	}
+	
+	H1 {
+		color : #000000;
+		margin-top : auto;
+		font-size : 16pt;
+	}
+	
+	H2 {
+		color : #000000;
+		font-size : 14pt;
+	}
+	
+	H3 {
+		color : #000000;
+		font-size : 12pt;
+	}
+	
+	H4 {
+		color : #000000;
+		font-size : 11pt;
+	}
+	
+	H5 {
+		color : #000000;
+		font-size : 10pt;
+	}
+	/* End Tag Level Selctors */
+	
+	#circuitBG {
+		position : static;
+		height : auto;
+		width : auto;
+		background-image : none;
+	}
+	
+	#loaderStatus {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	#cacheDiv {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	#sparky {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	/* Begin Content Area Selctors */
+	#contentPanel {
+		position : relative;
+		top : auto;
+		height : auto;
+		left : auto;
+		right : auto;
+		clear : both;
+	}
+	
+	/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+	#circuitBG>#contentPanel {
+		position : static;
+		top : auto;
+		bottom : auto;
+		height : auto;
+		clear : both;
+	}
+		
+		#contentPanel #contentTop {
+			position : static;
+			top : auto;
+			height : auto;
+			width : auto;
+			display : none;
+			visibility : hidden;
+		}
+	
+		/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+		#contentPanel>#contentTop {
+			position : static;
+			top : auto;
+			width : auto;
+			left : auto;
+			right : auto;
+			display : none;
+			visibility : hidden;
+		}
+			
+		#contentPanel #contentBody {
+			position : static;
+			top : auto;
+			height : auto;
+			width : auto;
+		}
+	
+		/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+		#contentPanel>#contentBody {
+			position : static;
+			top : auto;
+			bottom : auto;
+			height : auto;
+			left : auto;
+			right : auto;
+		}
+	
+			#contentPanel #contentBody #contentBodyLeft {
+				position : static;
+				width : auto;
+				height : auto;
+				left : auto;
+				top : auto;
+				background-image : none;
+				display : none;
+				visibility : hidden;
+			}
+			
+			/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+			#contentPanel #contentBody>#contentBodyLeft {
+				position : static;
+				height : auto;
+				bottom : auto;
+				display : none;
+				visibility : hidden;
+			}
+	
+			#contentPanel #contentBody #contentArea {
+				position : static;
+				width : auto;
+				height : auto;
+				margin-left : auto;
+				margin-right : auto;
+				background-image : none;
+			}
+			
+			/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+			#contentPanel #contentBody>#contentArea {
+				position : static;
+				width : auto;
+				height : auto;
+				margin : auto;
+				top : auto;
+				bottom : auto;
+				left : auto;
+				right : auto;
+			}
+	
+				#contentPanel #contentBody #contentArea #content {
+					position : static;
+					height : auto;
+					width : 90%;
+					overflow : visible;
+				}
+			
+				#contentPanel #contentBody #contentArea>#content {
+					width : auto;
+				}
+
+			#contentPanel #contentBody #contentBodyRight {
+				position : static;
+				width : auto;
+				height : auto;
+				right : auto;
+				top : auto;
+				background-image : none;
+				display : none;
+				visibility : hidden;
+			}
+	
+		#contentPanel #contentBottom {
+			position : static;
+			top : auto;
+			height : auto;
+			width : auto;
+			display : none;
+			visibility : hidden;
+		}
+	
+		/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+		#contentPanel>#contentBottom {
+			position : static;
+			top : auto;
+			bottom : auto;
+			width : auto;
+			left : auto;
+			right : auto;
+			display : none;
+			visibility : hidden;
+		}
+	/* End Content Area Selctors */
+			
+	/* Begin Logo Selctor */
+	#logo {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	#printLogo {
+		position : relative;
+		top : auto;
+		left : auto;
+		height : 160px;
+		width : 169px;
+		float : left;
+		z-index : 1;
+	}
+	
+	#printBanner {
+		color : #000000;
+		margin-top : auto;
+		font-size : 16pt;
+		font-weight : bold;
+		width : 25em;
+		z-index : 1;
+	}
+
+	#printLogoCover {
+		position : static;
+		top : auto;
+		left : auto;
+		height : auto;
+		width : auto;
+		background-color : transparent;
+		display : none;
+		visibility : hidden;
+	}
+	/* End Logo Selctors */
+		
+	/* Begin Selected Topic Bar Selctors */
+	#selectedBar {
+		position : relative;
+		top : 0px;
+		left : 0px;
+		right : auto;
+		width : auto;
+		height : auto;
+		margin-left : 170px;
+		margin-top : 45px;
+		padding : 0px;
+	}
+	
+	/* this rule is skipped by IE - this is the PROPER way to draw that div! */
+	#circuitBG>#selectedBar {
+		position : relative;
+		top : 0px;
+		left : 0px;
+		right : auto;
+		width : auto;
+		height : auto;
+		margin-left : 170px;
+		margin-top : 45px;
+		padding : 0px;
+	}
+	/* End Selected Topic Bar Selctors */
+	
+	.selectedBar {
+		position : relative;
+		top : 0px;
+		left : 0px;
+		right : auto;
+		width : auto;
+		height : auto;
+		margin-left : 170px;
+		margin-top : 45px;
+		padding : 0px;
+	}
+	
+	/* Begin UnSelected Topic Bar Selctors */
+	#unSelectedBarArea {
+		position : static;
+		top : auto;
+		left : auto;
+		height : auto;
+		width : auto;
+		display : none;
+		visibility : hidden;
+	}
+	
+	.unSelectedBar {
+		position : static;
+		top : auto;
+		left : auto;
+		height : auto;
+		width : auto;
+		display : none;
+		visibility : hidden;
+	}
+	/* End UnSelected Topic Bar Selctors */
+	
+	/* Begin Topic Bar ID Selctors */
+	#topicBar1, #topicBar2, #topicBar3, #topicBar4, #topicBar5, #topicBar6 {
+		position : absolute;
+		top : 0px;
+		left : 0px;
+		right : auto;
+		width : auto;
+		height : auto;
+		margin : 0px;
+		margin-top : 45px;
+		padding : 0px;
+	}
+	/* End Topic Bar ID Selctors */
+	
+	/* Begin SubMenu Selctors */
+	#subMenu {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	/* End SubMenu Selctors */
+			
+	/* Begin Topic Bar Class Selctors */
+	.topicBar {
+		position : absolute;
+		top : 0px;
+		left : 0px;
+		right : auto;
+		width : auto;
+		height : auto;
+		margin : 0px;
+		padding : 0px;
+	}
+	
+		.topicBarTop {
+			position : static;
+			display : none;
+			visibility : hidden;
+		}
+					
+		.topicBarBody {
+			position : relative;
+			width : auto;
+			height : auto;
+		}
+	
+			.topicBarBody .topicBarBodyLeft {
+				position : static;
+				display : none;
+				visibility : hidden;
+			}
+		
+			.topicBarBody .topicBarBodyMiddle {
+				position : static;
+				left : auto;
+				width : auto;
+				height : auto;
+				margin : 0px;
+			}
+	
+				.topicBarBody .topicBarBodyMiddle .barText {
+					position : static;
+					font-size : 12pt;
+					color : #000000;
+					float : left;
+				}		
+					
+				.topicBar .topicBarBody .topicBarBodyMiddle .barText A:link, .topicBar .topicBarBody .topicBarBodyMiddle .barText A:visited {
+					color : #000000;
+					text-decoration : none;
+				}			
+	
+				.topicBar .topicBarBody .topicBarBodyMiddle .barText>A:link {
+					color : inherit;
+					text-decoration : none;
+				}	
+							
+				.topicBar .topicBarBody .topicBarBodyMiddle .barText A:hover, .topicBar .topicBarBody .topicBarBodyMiddle .barText A:active {
+					color : #000000;
+					text-decoration : none;
+				}				
+				
+			.topicBarBody .topicBarBodyRight {
+				position : static;
+				display : none;
+				visibility : hidden;
+			}
+				
+		.topicBarBottom {
+			position : static;
+			display : none;
+			visibility : hidden;
+		}
+	/* End Topic Bar Class Selctors */
+	
+	/* Begin SubTopic Class Selectors */
+	.subTopic {
+		position : relative;
+		height : auto;
+		width : 100%;
+		white-space : nowrap;
+		float : left;
+		margin-left : .75em;
+		margin-right : .75em;
+		top : 0px;
+	}
+	
+		.subTopicLeft {
+			position : static;
+			display : none;
+			visibility : hidden;
+		}
+	
+		.subTopicBody {
+			position : relative;
+			height : auto;
+			width : auto;
+			top : 0px;
+			font-size : 12pt;
+			color : #000000;
+		}
+		
+		/* IE Forces yet another CSS trick to fix it */
+		.subTopic>.subTopicBody {
+			width : 100%;
+		}	
+		
+		.subTopicBody A:link, .subTopicBody A:visited {
+			color : #000000;
+			text-decoration : none;
+		}			
+		
+		.subTopicBody A:hover, .subTopicBody A:active {
+			color : #000000;
+			text-decoration : none;
+		}		
+	
+		.subTopicRight {
+			position : static;
+			display : none;
+			visibility : hidden;
+		}
+
+	/* End SubTopic Class Selectors */
+	
+	
+	/* Begin content formatting selectors */
+	#subMenuGapper {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	.bodyText {
+		font-family : Arial, Verdana, Helvetica, sans-serif;
+		font-size : 10pt;
+		color : #000000;
+		font-style : normal;
+		font-variant : normal;
+		font-weight : normal;
+	}
+	
+	.bodyText A:link, .bodyText A:visited {
+		color : #49EC2D;
+		text-decoration : underline;
+	}
+			
+	.bodyText A:active, .bodyText A:hover {
+		color : #FFFF00;
+	}
+	
+	.clearAll {
+		clear : both;
+	}
+	
+	.photoRight {
+		position : relative;
+		float : right;
+		width : auto;
+		height : auto;
+		border : 1px solid #000000;
+		padding : 3px 3px 3px 3px;
+		margin : 3px 3px 3px 3px;
+		text-align : center;
+	}
+	
+	.photoLeft {
+		position : relative;
+		float : left;
+		width : auto;
+		height : auto;
+		border : 1px solid #000000;
+		padding : 3px 3px 3px 3px;
+		margin : 3px 3px 3px 3px;
+		text-align : center;
+	}
+	
+	.bodyText TABLE {
+		border-collapse : collapse;
+		border-spacing : 0px;
+		empty-cells : show;
+		table-layout : auto;
+		margin : 0px 0px 0px 0px;
+		padding : 0px 0px 0px 0px;
+		border : 0px none;
+		width : 95.25%;
+		/* Begin Cute Hack to Get IE to not treat tables as font-size insulator */
+		font-family : Arial, Helvetica, sans-serif;
+		color : #000000;
+		font-size : 100%;
+		/* End Cute Hack to Get IE to not treat tables as font-size insulator */
+	}
+	
+	.bodyText TABLE TH {
+		color : #000000;
+		background-color : transparent;
+	}
+	
+	.bodyText TABLE .altRow {
+		background-color : #CCCCCC;
+	}
+	
+	.breadCrumbCurrent {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	.breadCrumbHist {
+		position : static;
+		display : none;
+		visibility : hidden;
+	}
+	
+	/* End content formatting selectors */
+}

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Untitled</title>
+</head>
+
+<body>
+
+
+<script type="text/javascript">
+//This Function sets up the XML/HTTP Request object - Used to retrieve content.
+function GetHttpReqObj() {
+	var xmlHttp = false; 
+	
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		try { 
+			xmlHttp = new XMLHttpRequest(); 
+		} catch (e) { 
+			xmlHttp = false; 
+		} 
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML3.XMLHTTP", "MSXML2.XMLHTTP", "MSXML.XMLHTTP", "Microsoft.XMLHTTP"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlHttp = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+			
+	}
+
+	xmlHttp.onreadystatechange = HandleReadyStateChange; 
+
+	return xmlHttp; 
+}
+
+//As soon as the document is loaded, this will load it into the global xmlDoc.
+function HandleReadyStateChange() {
+	if(httpReq.readyState == 4) { 
+		//Loaded!  Pass on and build DOM
+		xmlDoc = ParseIntoXml(httpReq.responseText);
+		
+		//This would be a the place for the setTimeout wait animation termination.
+		alert("Document Loaded");
+	}
+}
+
+//This function sets up what to use to parse the XML.
+function GetXMLParser() {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlParser = new DOMParser();
+	} else if(window.ActiveXObject) { //Check for IE
+		var aryActiveXObj = ["MSXML4.DOMDocument", "MSXML3.DOMDocument", "MSXML2.DOMDocument", "MSXML.DOMDocument", "Microsoft.XmlDom"];
+
+	    //Yuck - Microsoft!  Which One does it have?
+	    for(var i = 0; i < aryActiveXObj.length; i++) {
+	        //Try Different Objects until we find the right one.
+	        try {
+	            var xmlParser = new ActiveXObject(aryActiveXObj[i]);
+	            break; //found it              
+	        } catch(e) { 
+				//Keep looking.
+	        } 
+	    } 
+		xmlParser.async = false; //Enforce download of XML file first. IE only.
+	}
+	
+	return xmlParser;
+}
+
+//This function parses the retrieved document into the xml tree.
+function ParseIntoXml(strXML) {
+	//Test for Mozilla/W3C DOM based
+	if (document.implementation && document.implementation.createDocument) {
+		var xmlDoc = xmlParser.parseFromString(strXML, "text/xml");
+		return xmlDoc;
+
+	} else if(window.ActiveXObject) { //Check for IE
+		xmlParser.loadXML(strXML);
+		return xmlParser;
+	}
+	
+}
+
+//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+function RemoveBadNodes(xmlDocPart) {
+	for (var i = 0; i < xmlDocPart.childNodes.length; i++) {
+		if(xmlDocPart.childNodes[i].nodeType != 1) { // == 3 && (!notWhitespace.test(xmlDocPart.childNodes[i].nodeValue))) {
+			// that is, if it's a whitespace text node
+			xmlDocPart.removeChild(xmlDocPart.childNodes[i]);
+			i--;
+		}
+	}
+	
+	return xmlDocPart;
+}
+
+//This function loads the XML Document
+function GetExternalDocument(xmlDocFileName) {
+	//This would be where the begin getXML process would start.
+	httpReq.open("GET", xmlDocFileName, true); 
+	httpReq.send(null);
+
+}
+
+function TestMe() {
+	//alert(httpReq.responseText);
+	var configData = null;
+	
+	try {
+		//This top method works in Mozilla and other browsers that don't suck.  It actually allows for elements to be gotten.
+		
+		//alert(xmlDoc.getElementById("configData").innerHTML);
+		//alert(xmlDoc.getElementById("content").innerHTML);
+		configData = xmlDoc.getElementById("configData");
+		
+		//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+		RemoveBadNodes(configData);
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert(configData.childNodes[i].innerHTML);
+			try {
+				//alert("inner: " + configData.childNodes[i].childNodes.length); //configData.childNodes[i].getElementsByTagName("div")[0].innerHTML
+				RemoveBadNodes(configData.childNodes[i]);
+				for(var j = 0; i < configData.childNodes[i].childNodes.length; j++) {
+					alert("innerHTML: " + j + " " + configData.childNodes[i].childNodes[j].nodeType + "\n" + configData.childNodes[i].childNodes[j].innerHTML);  //configData.childNodes[i].getElementsByTagName("div")[j].innerHTML
+					
+				}
+			} catch(err) {
+				//alert("Barf!");
+			}
+		}
+	} catch(e) {
+		//The method below is what IE must use to get to indidividual nodes.  Much less precise than Moz based.
+		//One problem remains - stripping extra tag from around the outside of it - for some oddball reason IE likes leaving it.
+		
+		//alert(xmlDoc.getElementsByTagName("body")[0].childNodes[0].xml);
+		//alert(xmlDoc.getElementsByTagName("body")[0].childNodes[1].xml);
+		configData = xmlDoc.getElementsByTagName("body")[0].childNodes[0];
+
+		for(var i = 0; i < configData.childNodes.length; i++) {
+			alert(configData.childNodes[i].xml);
+			try {
+				//alert("inner: " + configData.childNodes[i].childNodes.length); //configData.childNodes[i].childNodes[0].xml
+				RemoveBadNodes(configData.childNodes[i]);
+				for(var j = 0; i < configData.childNodes[i].childNodes.length; j++) {
+					alert("innerHTML: " + j + " " + configData.childNodes[i].childNodes[j].nodeType + "\n" + configData.childNodes[i].childNodes[j].xml);  
+					
+				}
+			} catch(err) {
+				//alert("Barf!");
+			}
+		}
+	}
+}
+
+function FillContent() {
+	try {
+		document.getElementById("contentDiv").innerHTML = xmlDoc.getElementById("content").innerHTML;
+	} catch(e) {
+		//document.getElementById("contentDiv").innerHTML = 		alert("catchBlock\n" + );
+		document.getElementById("contentDiv").innerHTML = xmlDoc.getElementsByTagName("body")[0].childNodes[1].xml; //"Bill Gates sucks my balls";
+	}		
+}
+
+//var xmlObj = new XmlObj();
+var httpReq = new GetHttpReqObj();
+var xmlParser = new GetXMLParser();
+var xmlDoc = null;
+
+//xmlDoc.GetXML = new function(url) { xmlDoc.open("GET", url, true); http.send(null);	}
+
+
+</script>
+
+<a href="JavaScript:GetExternalDocument('home.html')">Load It</a><br />
+<a href="JavaScript:TestMe()">Test It</a><br />
+<a href="JavaScript:FillContent()">Fill Content</a><br />
+
+<div id="contentDiv">
+First Text
+</div>
+
+</body>
+</html>

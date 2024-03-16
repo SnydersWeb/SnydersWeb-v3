@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!-- All scripts and graphics on this website (c) 2005 David Snyder -->
+<head>
+	<title>Snyders Web</title>
+
+	<link rel="icon" href="favicon.ico" />
+	<link rel="SHORTCUT ICON" href="favicon.ico" />
+	
+</head>
+
+<body>
+
+<script type="text/javascript">
+var fetchedValue = null;
+
+//load xml file
+if (window.ActiveXObject) {//IE
+	var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+	xmlDoc.async = false; //Enforce download of XML file first. IE only.
+} else if (document.implementation && document.implementation.createDocument) {
+	var xmlDoc = document.implementation.createDocument("", "doc", null);
+}
+
+if (typeof xmlDoc != "undefined") {
+	//xmlDoc.load("home.html");
+	xmlDoc.load("text.xml");
+}
+
+//Regular expression used to match any non-whitespace character
+var notWhitespace = /\S/
+
+function GetDaily() {
+	//Cache "messages" element of xml file
+	var msgobj = xmlDoc.getElementsByTagName("messages")[0];
+
+	//REMOVE white spaces in XML file. Intended mainly for NS6/Mozilla
+	for (i = 0; i < msgobj.childNodes.length; i++) {
+		if((msgobj.childNodes[i].nodeType == 3) && (!notWhitespace.test(msgobj.childNodes[i].nodeValue))) {
+			// that is, if it's a whitespace text node
+			msgobj.removeChild(msgobj.childNodes[i]);
+			i--;
+		}
+	}
+
+	var dateobj = new Date();
+	var today = dateobj.getDay(); //returns 0-6. 0=Sunday
+
+	//Get today's message and display it in DIV:
+	//document.getElementById("container").innerHTML = xmlDoc.getElementsByTagName("messages")[0].childNodes[today].firstChild.nodeValue;
+	fetchedValue = xmlDoc.getElementsByTagName("messages")[0].childNodes[today].firstChild.nodeValue;
+}
+
+function AlertVal() {
+	alert(fetchedValue);
+}
+
+/*
+if(typeof xmlDoc != "undefined") {
+	if (window.ActiveXObject) {//if IE, simply execute script (due to async prop).
+		//GetDaily();
+		GetGuts();
+	} else {//else if NS6, execute script when XML object has loaded
+		//xmlDoc.onload = GetDaily;
+		xmlDoc.onload = GetGuts;
+	}
+}
+*/
+
+</script>
+
+<div id="container"></div>
+
+<a href="JavaScript:GetDaily()">Load it!</a><br>
+<a href="JavaScript:AlertVal()">Test it!</a>
+
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!-- All scripts and graphics on this website (c) 2005 David Snyder -->
+<head>
+	<title>Snyders Web</title>
+
+	<link rel="icon" href="favicon.ico" />
+	<link rel="SHORTCUT ICON" href="favicon.ico" />
+	<script type="text/javascript" src="javaScripts/generalScripts.js"></script>
+	
+</head>
+
+
+
+<body>
+
+<script type="text/javascript">
+var client = new Client();	
+var fetchedDoc = null;
+
+//define factory
+function jsXML() { }
+
+//define method
+jsXML.createDOMDocument = function() {}
+
+//Define ActiveX DOM/XML possibility Array
+var ARR_ACTIVEX = ["MSXML4.DOMDocument", "MSXML3.DOMDocument", "MSXML2.DOMDocument", "MSXML.DOMDocument", "Microsoft.XmlDom"];
+var STR_ACTIVEX = "";
+
+//if this is IE, determine which string to use
+if(client.userAgent.indexOf('msie') != -1) {
+   //define found flag
+   var bFound = false;
+
+   //iterate through strings to determine which one to use
+   for(var i = 0; i < ARR_ACTIVEX.length && !bFound; i++) {
+      //set up try...catch block for trial and error of strings
+      try {
+         //try to create the object, it will cause an error if it doesn't work
+         var objXML = new ActiveXObject(ARR_ACTIVEX[i]);
+
+         //if it gets to this point, the string worked, so save it
+         STR_ACTIVEX = ARR_ACTIVEX[i];
+         bFound = true
+
+      } catch (objException) {
+      } 
+   } 
+   
+   //if we didn't find the string, send an error
+   if(!bFound)
+      throw "MSXML not found on your computer."
+}
+
+
+jsXML.createDOMDocument = function() {
+	//variable for the created DOM Document
+	var objDOM = null;
+	
+	//determine if this is a standards-compliant browser like Mozilla
+	if(document.implementation && document.implementation.createDocument) {
+		//create the DOM Document the standards way
+		//objDOM = document.implementation.createDocument("","", null);
+		//create the DOM Document the standards way
+		objDOM = document.implementation.createDocument(strNamespaceURI, strRootTagName, null);
+		
+		//add the loadXML() method to the Document class
+		Document.prototype.loadXML = function(strXML) {
+			//make sure to remove all nodes from the document
+			while(this.hasChildNodes())
+				this.removeChild(this.lastChild);
+  
+  			//create a DOMParser
+			var objDOMParser = new DOMParser();
+		 
+			//create new document from string
+			var objDoc = objDOMParser.parseFromString(strXML, "text/xml");
+			
+			//add the nodes from the new document
+			for (var i=0; i < objDoc.childNodes.length; i++) {
+				//import the node
+				var objImportedNode = this.importNode(objDoc.childNodes[i], true);
+				       
+				//append the child to the current document
+				this.appendChild(objImportedNode);
+			} 
+		
+			function _Node_getXML() {
+				//create a new XMLSerializer
+				var objXMLSerializer = new XMLSerializer;
+				
+				//get the XML string
+				var strXML = objXMLSerializer.serializeToString(this);
+				
+				//return the XML string
+				return strXML;
+			}
+			
+			Node.prototype.__defineGetter__("xml", _Node_getXML);
+			
+		}
+  		
+	} else if(client.userAgent.indexOf('msie') != -1) {
+		//create the DOM Document the IE way
+		objDOM = new ActiveXObject(STR_ACTIVEX);
+		
+		//if there is a root tag name, we need to preload the DOM
+		if (strRootTagName) {
+		
+		//If there is both a namespace and root tag name, then create an artifical namespace reference and load the XML.
+		if (strNamespaceURI) {
+				objDOM.loadXML("<a0:" + strRootTagName + "xmlns:a0=\"" + strNamespaceURI + "\" />");
+			} else {
+				objDOM.loadXML("<" + strRootTagName + "/>");
+			}
+		}
+	
+	}
+	
+	//return the object
+	return objDOM;
+}
+/*
+*/
+
+</script>
+
+<div id="container"></div>
+
+<a href="JavaScript:loadXML2('home.html')">Load it!</a><br>
+<a href="JavaScript:AlertVal()">Test it!</a>
+
+
+</body>
+</html>

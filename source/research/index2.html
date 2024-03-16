@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Snyder's Web - Home</title>
+	<script type="text/javascript" src="javaScripts/generalScripts.js"></script>
+	<script type="text/javascript" src="javaScripts/topicBarScripts.js"></script>
+	<script type="text/javascript" src="javaScripts/subMenuScripts.js"></script>
+	<script type="text/javascript" src="javaScripts/subTopicScripts.js"></script>
+	<script type="text/javascript" src="javaScripts/initScripts.js"></script>
+	<style type="text/css">
+	@import url("styleSheets/styleSheet.css");
+	</style>	
+</head>
+
+<body class="bodyBlack">
+
+<!-- Begin Content Loader iFrame -->
+<iframe id="fetchIframe" name="fetchIframe" style="visibility:hidden;position:absolute;top:425;width:165;height:50;"></iframe>
+<!-- End Content Loader iFrame -->
+
+<!-- Begin Logo Div -->
+<div id="snydersWebLogo" style="display:none;position:absolute;z-index:2;" class="snydersWebLogo"><img src="images/snydersWebLogo.gif" id="snydersWebLogoImg" width="171" height="146" alt="SnydersWeb.com" border="0" /></div>
+<!-- End Logo Div -->
+
+<!-- Begin Content Panel -->
+<div id="contentPanel" style="display:none;position:absolute;overflow:auto;z-index:1;" class="contentPanelFade_0">
+</div>
+<!-- Begin Content Panel -->
+
+<!-- Begin traceForm for Debugging End traceForm for Debugging -->
+<form name="traceForm" style="display:none;visibility:hidden;position:absolute;top:590;width:165;height:250;">
+<textarea name="trace" rows="6" cols="30"></textarea>
+</form>
+
+
+
+<script type="text/javascript">
+
+	//Need a better sniffer script of some sort.
+	var client = new Client();	
+		
+	/*
+	Check to see if the browser is compatible, if not send them to the legacy pages
+	!client.smellsGood ? window.location.href = "./legacyBrowser/home.html" : alert('hi')
+	*/
+	if(!client.smellsGood) {
+		window.location.href = "./legacyBrowser/home.html";
+	}
+	
+	
+	//Static Globals
+	var SHOW = "";
+	var HIDE = "none";
+	
+	var RIGHT_MARGIN = 5;
+	var LEFT_MARGIN = 5;
+	var TOP_MARGIN = 5;
+	
+	var UNSEL_BAR_LEFT = LEFT_MARGIN;
+	var UNSEL_BAR_SPACER = 5;
+	var UNSEL_BAR_TOP_START = 150;
+	var UNSEL_BAR_WIDTH = 160;
+	var UNSEL_BAR_HEIGHT = 31;
+	var UNSEL_BAR_SUB_MENU_SPACER = 10;
+	
+	var SEL_BAR_TOP = TOP_MARGIN;
+	var SEL_BAR_LEFT = 180;
+	var SEL_BAR_WIDTH = client.width - SEL_BAR_LEFT - RIGHT_MARGIN;
+	var SEL_BAR_HEIGHT = 27;
+	var SEL_BAR_SUB_MENU_SPACER = 225;
+	
+	var PRINT_AND_BOOKMARK_TOP = SEL_BAR_TOP + (SEL_BAR_HEIGHT - 4);
+	var PRINT_AND_BOOKMARK_LEFT = 30;
+	var PRINT_AND_BOOKMARK_HEIGHT = 25;
+	var PRINT_AND_BOOKMARK_WIDTH = 250;
+			
+	var CONT_PAN_TOP = 40;
+	var CONT_PAN_LEFT = UNSEL_BAR_LEFT + UNSEL_BAR_WIDTH + 20;
+	var CONT_PAN_WIDTH = client.width - CONT_PAN_LEFT;
+	var CONT_PAN_HEIGHT = client.height - CONT_PAN_TOP;
+
+	//Non Static Variables
+	var subMenuTop = 0;
+	var subMenuLeft = 0;
+	var subMenuWidth = 0;
+	var widthAdjust =  window.external ? 5 : -5;  //IE gets extra px somewhere, Mozilla loses some - only IE has window.external - may have to do with cellpadding added for mouseover stuff.
+		
+	//Setup Static Objects
+	var snydersWebLogoObj = document.getElementById("snydersWebLogo");
+	var loadingAnimObj = document.getElementById("loadingAnim");
+	var contentPanelObj = document.getElementById("contentPanel");
+	var fetchIframeObj = document.getElementById("fetchIframe");
+	
+	//Temporary currentLink storage global
+	var promoteTopicBarObj = null;		//Used to store newly selected topic - used for TopicBarPromote()
+	var returnTopicBarObj = null;		//Used to store currently selected topic - used for TopicBarReturn()
+	var promoteSubTopicObj = null;		//Used to store newly selected subTopic - used for SubMenuPromote()
+	var returnSubTopicObj = null;		//Used to store currently selected subTopic - used for SubMenuRemove()
+	
+	var arySubMenuTitles = null;	//Used to store subMenu object properties - populated from content fetcher iFrame.
+	var arySubMenuLinks = null;		//Used to store subMenu object properties - populated from content fetcher iFrame.
+	var currentContent = null; 		//Current Content global, used by the content fetching system
+	var subMenuObj = null;		//Stores the currently selected submenu
+	
+
+	//Set up contentPanelObj functions:
+	contentPanelObj.Restore = ContentPanelRestore;
+	contentPanelObj.Remove = ContentPanelRemove;
+	contentPanelObj.timeOut = null;
+	
+	//Global for controlling whether sound is on or off.
+	soundIsOn = false;
+	//Force sound off
+	client.hasSound = false;
+	
+	//Bar Objects
+	//Content Bar Registry Array
+	var aryTopicBars = new Array("Home", "About_Me", "Web_Sites", "Art_Portfolio", "Destinations", "Contact_Me");
+	//var aryTopicBars = new Array("Home", "About_Me", "Web_Sites", "Art_Portfolio", "Contact_Me");
+
+	//Properties are as follows: id, Title, ContentFile, StartLeft, StartTop, StartWidth, StartHeight
+	var aryHome_Props = new Array("Home", "Home", "contentFiles/home.html", UNSEL_BAR_LEFT, UNSEL_BAR_TOP_START, UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	var aryAbout_Me_Props = new Array("About_Me", "About Me", "contentFiles/aboutMe.html", UNSEL_BAR_LEFT, (UNSEL_BAR_TOP_START + UNSEL_BAR_HEIGHT + UNSEL_BAR_SPACER), UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	var aryWeb_Sites_Props = new Array("Web_Sites", "Web Sites", "contentFiles/webSites.html", UNSEL_BAR_LEFT, UNSEL_BAR_TOP_START + 2 * (UNSEL_BAR_HEIGHT + UNSEL_BAR_SPACER), UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	var aryArt_Portfolio_Props = new Array("Art_Portfolio", "Art Portfolio", "contentFiles/portfolio.html", UNSEL_BAR_LEFT, UNSEL_BAR_TOP_START + 3 * (UNSEL_BAR_HEIGHT + UNSEL_BAR_SPACER), UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	var aryDestinations_Props = new Array("Destinations", "Destinations", "contentFiles/destinations.html", UNSEL_BAR_LEFT, UNSEL_BAR_TOP_START + 4 * (UNSEL_BAR_HEIGHT + UNSEL_BAR_SPACER), UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	var aryContact_Me_Props = new Array("Contact_Me", "Contact Me", "contentFiles/contactMe.html", UNSEL_BAR_LEFT, UNSEL_BAR_TOP_START + 5 * (UNSEL_BAR_HEIGHT + UNSEL_BAR_SPACER), UNSEL_BAR_WIDTH, UNSEL_BAR_HEIGHT);
+	
+	//Create bars
+	var Home = TopicBarCreate(aryHome_Props);
+	var About_Me = TopicBarCreate(aryAbout_Me_Props);
+	var Web_Sites = TopicBarCreate(aryWeb_Sites_Props);
+	var Art_Portfolio = TopicBarCreate(aryArt_Portfolio_Props);
+	var Destinations = TopicBarCreate(aryDestinations_Props);
+	var Contact_Me = TopicBarCreate(aryContact_Me_Props);
+
+	//Select default content
+	HandleEntry();
+
+</script>
+
+</body>
+</html>

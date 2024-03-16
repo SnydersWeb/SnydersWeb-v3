@@ -1,0 +1,719 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+	<title>Dev Blog</title>
+</head>
+
+<body>
+<pre>
+Notes:
+3/6/2005
+	Back to tinkering with the website.  One thing I have discovered is that xhtml formatting is a bit different.  First off, no iFrame, which means that if I'm to use it, I'll have
+	to use the XML request object.
+	
+	The other problem is that the body tag under the XHTML spec doesn't support onresize, onunload, and some of the other things previous iterations of the site used. so I need to find a way to handle that.
+	
+	Ideally I'd get this thing set up such that the Legacy Browser version will go away.  That CSS would completely handle presentation.  If they have good DOM support, all
+	hyperlinks would be standard hyperlinks.  On a "straight" view, links would simply do what they would normally do - call pages.  Else they would call the animation sequences
+	that load it through the XML object.
+
+3/7/2005
+	After playing (and stripping down) the document to it's base elements - XHTML like I've seen on http://www.htmldog.com not sure how theirs is working yet I can't seem to get it working
+	through local file access.   Could be that you need a webserver to pull that off *shrug*.  Still, I want a site that can be run off CDRom or local file access.
+	
+	Due to that, I might end up going with HTML 4.01 trans.
+
+3/11/2005
+	Still playing around with different XML request methods in Mozilla.  One problem I am continiually running into is it would seem that Moz's request code is very persnickity
+	as far as what it will eat and not eat.  Changing the extension to XML or XHTML seems to satisfy it, however the problem in doing so is that the browsers tend to handle
+	the content differently when loaded.  HTML extension produces consistent results but again Moz's requester doesn't seem to like it much.  Joy.
+	
+	The whole point is to go with an XML request object instead of using the legacy iFrame.
+	
+	To IE's credit, it's XML Request object seems to eat anything that's validly formed.  Sooo.. how does one get Moz to relax a bit on that?
+	
+	One other work around - Moz has the xmlHttpRequest, but it also has a way to request files locally.  To make things more fun, not only is the goal to unify the legacy browser
+	and dhtml content files, but to also have this thing work regardless of whether it's over http or file.
+	
+3/12/2005
+	Test3.html seems to have the most progress here.  Using httpRequest, I have managed to get it to pull in documents of any type regardless of whether it's local file 
+	access or via http.
+	
+	The raw ResponseText unfortunately doesn't have any DOM methods.  One way to gain that is to add it to a div.  Displayed on screen it has everything but the javascript vars.
+	
+	One way around this might be to use a cute hidden DIV/Element cheat and get the innerHTML out of them.  Those divs would have stylesheet that says hidden.  Never displayed on
+	screen, but there containing all the data I need, including netsting information.  A kind of XHTML embedded XML that shouldn't break compliance.
+	
+	As a nice side effect of this technique, I can actually use the existing HTML, parse it in, and grab little bits here and there.
+	
+	Problems:
+		1. I would like to see if there's a way I can pass the responseText into some form of object that can be manipulated without resulting to hidden items or screen display.
+	
+		2. Get the configData
+
+3/14/2005
+	Some useful links/data on parsing in:
+		http://www.mozillazine.org/talkback.html?article=4154
+		http://www.mozilla.org/xmlextras/xmldataislands/
+		http://nexgenmedia.net/evang/iemozguide/
+
+	Will follow up with that on Tuesday.
+	
+	In the mean time I discovered this:
+	WHEN SWITCHING SITE OVER TO XHTML, MOZILLA IS PICKY ABOUT TOP/LEFT/RIGHT/BOTTOM PLACEMENT!!!  MUST SAY "PX" AFTER SPECIFIED NUMBERS.
+	
+	Under HTML 4.x, it will just take .style.top = 50;, under XHTML that has to be .style.top = 50 + "px";  Least in that respect it's more consistent because several times
+	I had to use parseInt to strip the "px" off.
+	
+3/15/2005
+	Moz's DOMParser or XML parser seems to only really enjoy eating true XML.  Anything other than real XML chokes it hard.
+	
+	Might be able to load a part of the document in...
+	
+3/19/2005 
+	SUCCESS!  I have thisWorksPrefectInMoz.html which is a test case that shwos you can parse it into Moz's XML object and get bits and pieces of it using the DOM methods 
+	to dissect it however you want.
+	
+	The only part that I'm struggling with now is to see if there's a way to get that POS from MS to have getElementById type functionality attached to an XML object.
+	
+	I have a gross-assed hack where I stuff it into a DIV and then THAT gives me the ability to getElementById. still.. eeew.
+	
+	One other alternative that seems to work for IE, instead of xmlDoc.getElementById("configData").innerHTML you have to use xmlDoc.getElementsByTagName("body")[0].childNodes[0].xml
+	childNodes[x] is the child Node where whatever content lives.  Iterating through subnodes of the configuration data is a different matter.  getElementsByTagName iterates
+	deep into the heirarchy, getting EVERYTHING.  childNodes calls on this seems to fix that well enough.
+	
+	A typical load sequence for the new website is likely to consist of the following sequence of events:
+		1. Clear Content Field with a nice wipe effect. (clip)
+		2. Show "Accessing..." loop while xml object retrieves content.
+		3. Once xml object has content, perform configuration data and content parsing.  Hyperlinks need to be redirected to be passed through xml requester object.
+		4. Demote/promote bars/sub items and display new content.
+	
+	Need to do a little digging into the current site code and re-learn what the hell I did before.  If I know me I did what I did above only that time it was fully initiated 
+	from the iFrame onload handler.
+	
+	Still, one thing that makes me nervious is what problems I'm gonna run into w/IE.  Pretty happy w/Moz.  
+	
+	Next phases:
+		1. Develop Graphics for new site.
+		2. Create pure CSS based layout static version.
+		3. Build DHTML version to use static version - that will accomplish 3 things
+			1. Make the site MUCH easier to maintain and update
+			2. Depricate support for NS4 and get it XHMTL STRICT compliant
+			3. Make the site MUCH friendlier to search engines.
+		4. MASSIVE content update somewhere in here.
+
+7/30/2005
+	Back at the keyboard.  Working on brushing up onmy research work.  So I can understand a tad more about what the hell it was I was doing before.
+	
+	One challenge I'm going to be faced with in the process of creating the new website is to come up with a way to parse out configuration data from the rest of the document.
+	Moz and IE differ quite a bit in this respect.  IE7 is quite a question in itself.  God knows what all MS is going to do on this one.  Not holding my breath.  Frankly I expect 
+	the same old shit from MS: Substandard and bastardized implementations of the open standards.
+	
+	It will likely take totally different node parsers between IE and Mozilla.  Both are behaved pretty differently yet similar enough I should be able to make due.
+	
+	Next up, might be a good thing to experiment with a CSS-P layout for this.
+	
+8/12/2005
+	Completed:
+		* Design work
+		* CSS-P work
+		* Print Style Sheet - complete with hidden print-friendly logo
+		* Graphics Creation
+		* Base HTML work
+		
+	Not bad, quite pleased with the CSS-P and print style sheet work.  As it stands, this site will raise the bar a bit in terms of browser
+	requirements to view even the base HTML.  Though really I don't care.  If someone is still kicking around with a 4.x browser they
+	need to consider upgrading - badly!
+	
+	I also did a quick clean-up of SnydersWeb 1 2 and now 3 directories on coruscant.
+	
+	To Do: 
+		* Client detection script needs to be updated
+			* add XML stuff to it
+			* set up different function pointers - DOM and MSIE
+		* Fully develop a way to pull in content meta data.  Under IE I expect this will be tricky.
+			* Some of the old site's code should still be good provided I can use information collected via XML in it.  I recall 
+			  writing the original version of that script for 2.0 site - very tricky one!
+			* Stuff the xml parser will need to do:
+				* Get Currently selected topic bar
+				* Get current sub level under topic bar
+				* Get SubMenu (if present)
+				* Pull in all content
+				* Globally change all relative href links to use function calls to go through the XMLFetcher functions.
+		* Animations
+			* Animations may take additional "Hot" graphics sets
+			* All image replacements will be done via Stylesheets.
+			* Add "Accessing" type notification when xml object is pulling content in.
+			* "Sparky"
+			* Load sequence
+
+8/13/2005
+	Early morning research work...
+	
+	One thing I discovered is that the things can be overridden OK, styles will flow along as what's natural.  So if I override the 
+	parent element, children will tag along without need to set their attributes as well.  This will hopefully make coding a tad easier.
+			
+	In order to get full freedom and mobility - attributes of the parent element will have to be essentially reset or reprogrammed.
+		
+	On this I know MSIE is going to suck because it can't draw divs properly using top, right, bottom left type height/width - you 
+	have to either use relative positioned divs with hard set heights (percent or hard-set). The contentPanel is of particular 
+	difficulty in this case since the heights are beign set by percentages in IE and that rule is being re-written in Moz to be absolute
+	and to use the better positioning and sizing techniques.
+	
+	Case in point is below:
+		var topicBar = document.getElementById("contentPanel");
+		topicBar.style.position = "absolute";
+		topicBar.style.margin = "0px";
+		topicBar.style.top = "150px";
+		topicBar.style.bottom = "auto";
+		topicBar.style.left = "150px";
+		topicBar.style.width = "350px";
+		topicBar.style.height = "350px";
+		topicBar.style.backgroundColor = "#ff0000";
+		
+		//All this shit is needed to appease IE!
+		document.getElementById("contentTop").style.position = "absolute";
+		document.getElementById("contentBody").style.position = "absolute";
+		document.getElementById("contentBottom").style.position = "absolute";
+		document.getElementById("contentTop").style.top = "0px";
+		
+		document.getElementById("contentBody").style.top = "15px";
+		document.getElementById("contentBody").style.height = (parseInt(document.getElementById("contentBody").parentNode.style.height) - 26) + "px";//"auto";
+		
+		document.getElementById("contentBottom").style.top = "auto";
+		document.getElementById("contentBottom").style.bottom = "0px";
+
+	The biggest part of this is the part with the parseInt where heights are being used.
+	
+	To solve this I could do one of two things - one is to run both browsers through this or I can give IE it's "special" code.  Tempted to
+	do the latter since MS is working on IE7 which is promised to be more css compliant.  
+	
+	Just the same - one thing that is going to added to this site:
+		BIG FUCKING GET FIREFOX LOGO!
+			
+	Not sure how much grief IE is going to put me through when it comes to parsing xml... ugh.
+	
+	Next up - implementing client objects and starting xml parsing research work.
+	
+	Ugh, if only, if only, if ONLY MS, for all their fucking BILLIONS of dollars and THOUSANDS of skilled programmers had not abandoned 
+	making IE better after it got the crown.. this boys and girls is why it's bad when MS gets dominence over anything!  Innovation dies.
+	
+	I've gotten IE where it can get to the content and insert it.  However, moving around IE's xml document object is grossly inefficient and
+	painful compared to Moz.  One other problem I'm running into is altering data in it.  Hopefully MS has given methods for doing so.
+	I'll need to dig up that crap.  
+	
+	On a brighter note, I should be able to totally separate the parts of the code that have dramatic differences between IE and Moz.
+	The Client object might be a good place to include the XML handling libraries once the base objects are created.  The following
+	code works pretty nicely:
+		newScript = document.body.appendChild(document.createElement("script"));
+		newScript.type = "text/javascript";
+		newScript.src = scriptSrc;
+
+	Older varients of browsers may barf on this - hard telling really.  Safe thing to do is to give a scaled back version to old browsers that
+	doesn't do any XML or animations outside of pull the submenu up/down.  Which is what is planned for Konq based.
+
+8/13/2005 Later:
+	In IE I managed to find a way to get it to change hrefs in content and other:
+		xmlDoc.getElementsByTagName("body")[0].childNodes[4].childNodes[10].childNodes[1].getElementsByTagName("a")[i].setAttribute("href","changed!:" + xmlDoc.getElementsByTagName("body")[0].childNodes[4].childNodes[10].childNodes[1].getElementsByTagName("a")[i].getAttribute("href"));
+	
+	Intformation about this was found here:
+	http://www.devguru.com/Technologies/xmldom/quickref/document_loadXML.html
+	
+	WHOHOO!  FOUND IT!
+	xmlDoc.nodeFromID("content")
+	
+	Thank god!
+	
+	So in IE xmlDoc.nodeFromID("content") replaces Moz's xmlDoc.getElementById("content");
+	
+	One other thing is that in Moz you do:
+		configData.childNodes[i].attribute (i.e. configData.childNodes[i].id) to tell you what it's ID is.
+	
+	In IE you do
+		configData.childNodes[i].getAttribute(attribute) (i.e. configData.childNodes[i].getAttribute("id") to tell you the same
+		
+	Not too bad - I can live with this.
+	
+	Lately I've been thinking of the load/init sequence.  Since any page can exist as an entry point - the init sequence also needs
+	to be responsible for creating all bar objects and so on.  It will also be responsible for setting what bar is "hot".
+	
+	Debating whether to remove all container objects and to use <div id="topicBarX"><div that make topic Bar></div>
+
+8/14/2005
+	Started wiring in the XML functions and Client object.
+	
+	So far so good. Unforunately it's impossible to dynamically include scripts using document.createElement.  Yes, you can pull them in
+	but they don't pull in fast enough to be called upon at runtime.
+	
+	XML Objects are now part of the Client object as they should be since they are browser dependent.  Other items that are browser dependent
+	such as function calls will also be part of the client object with function pointers (see ParseIntoXML pointer)
+	
+	One thing that is showing up in IE is that it seems to be including outer tags.  Will need to strip that somehow.
+	
+	The init sequence will need to do the following:
+	1. Create Client Object (done)
+	2. Detect XML Capability, if good (done)
+		a. Create objects for all topicBar items.
+			i. Destroy original?
+		b. Determine which bar is selected
+			i. Get sub topic items from it
+			ii. Get sub menu
+			iii. Create sub topic
+			iv. Create sub menu
+		c. Animation scripts or placeholders
+	3. No XML capability
+		a. If DHTML/DOM
+			i. Create or link submenu animation script.
+		b. Else
+			i. Uh, well... maybe move it over so someone can scroll the div - right now it overalaps.  Hard telling what all it 
+			   supports.  Safe to say they are way outside of the target audience for this site.
+
+	Thoughts on the bars...
+	
+	Problem is that somewhere in the code there will need to be a "registry" of the bar objects.  The bar objects differ from the submenu
+	or subtopic because they're moved around and there's more than one of them.  One other matter complicating them is that they can be a child object of the selected 
+	title bar div or the unselected title bar div.  So in this case it might be better to have registry of them.  An array might make more sense here.
+	
+	I've made a global array for the topicBar objects to hold that.  An array made more sense since it made an easier way to iterate
+	through the collection to determine who was selected or not.  In addition to that, it should still lend itself to the global 
+	object pointers for animation.
+	
+	Next step is to comb through the bar collection and re-create them.  After that, destroy the originals.
+	
+	Also need to set up globals for the content panel.
+
+8/15/2005
+	Worked on and got the link adjuster working - might tweak it a tad more to open .gif and .jpg documents in a special document viewer function.
+	
+	One MAJOR problem I seem to have run into is recycling the XML requestor - or resetting the damned thing.  Will need to research
+	this one.
+	
+	In the mean time - the TopicBar creation/initialization scripts have been started.		
+	
+	Hmm - xml object has a onreadystatechange property that might be good for the loading sequence - assuming I figure out how to get the object to reset.
+	
+ 	Surely this isn't a one shot deal with the requestor....
+	
+8/16/2005
+	Huzzah!  GOT IT!  What it was was the location of the readyStateChange function.  Apparently this needs to be assigned/linked right before 
+	XMLHttpRequest sends.
+	
+	Now I can request as many documents as needed.
+	
+	Done tonight:
+		* TopicBar Re-Creation/positioning (destroy old)
+		* Removed different versions of FixLink for IE/Moz - Moz is happy with SetAttribute - fine by me!
+		* Content Panel tweaks for IE (positioning/et al) - made conditional in hopes IE 7 isn't such a vile POS.
+		* Placeholder function to handle the topic bar clicks
+		* Of course fixed the XML Requestor system - thank god, that one had my nervious.
+		
+	ToDo in terms of parsing in start document:
+		* Parse in subTopic bars/objects (maybe eff with the css to nest them so childNodes.childNodes can be done ad nauseum.
+		* Parse in subMenu
+	
+	Next in the grander scheme:
+		* Parse in requested document - detecting interface changes. (contentPageScripts from 2.0 might offer clues)
+		* Change interface
+		* Animations
+		* Start Sequence
+		* QED!
+
+8/17/2005
+	Done tonight:
+		* SubMenu Creation
+		* SubMenu onClick placeholder with event cancellation
+		* Adjusted where TopicBar's OnClick handler was assigned, now it's assigned to the topic bar itself - IE kept bubbling it to parent
+		  in spite of my attempts to stop it.
+	
+	ToDo:
+		* Parse in subTopic bars/objects (maybe eff with the css to nest them so childNodes.childNodes can be done ad nauseum.
+		* Assign subMenu mouseover/out handlers for interactivity
+	
+	Still need to clean up how the topic bars and sub menus are created.  Not totally happy with them just yet.  What I have now works
+	but still...
+	
+	Unfortunately after an hour or two of mucking with the subtopic nesting I couldn't get anything I was happy with.  Kept wrapping.
+	Still, need to come up with a technique that uses recursion to keep appending subTopic items as deep as it can go.
+	
+	At this point most of the document is being re-created via DHTML.
+
+8/18/2005				
+	Done tonight:
+		* SubMenu MouseOver/MouseOut - might do some type of animation on this, right now it's very simple popdown type.
+		* Reworked stylesheets slightly to accomodate submenu animations
+		* Made further adjustments to the stylesheet so that the topic bars will flow more naturally as the window is resized.  
+			IE6 will still need a body.onresize handler, IE7 might be able to do without it - assuming MS WILL fix that POS.
+		* Modest Reworking of code.
+		* Added global TopicBar and SubTopic holders.
+	
+	ToDo:
+		* Parse in subTopic bars/objects
+		* XML Content parsing
+		* Context Checking
+		* Animations
+		* Load Sequence
+	
+	The subTopic bars might be a bit of a trick, I was hoping to nest them inside each other so I could use a recursion to get
+	all of them and append the children to each other.
+	
+	A workaround might be to getEByTagName("div") and use that after the first div not quite as self contained and elegant as 
+	recursion...
+	
+	Once the document is being totally created via DHTML, Need to screed back over the code - and also consider its appication 
+	on XML content that is brought in.	
+
+8/19/2005
+	Done tonight:
+		* "Hot" anmation CSS selectors and graphics created
+		* Reworked the appearence of subTopics and made some adjustments to the stylesheet.  Also created graphics for base, sel and hot 
+		  for that.
+		* Reworked some aspects of the stylesheet - got rid of a bunch of .left and .right type stuff since it had a tendency to collide 
+		  with other .lefts and .rights.
+				  
+	To Do:
+	Same crap as last night
+	
+	One nagging concern, in parsing in XHTML, I may very well have to create special parser functions for sub items (topic and menu) since
+	items are the most different from page to page.  The bars are assumed to be consistent, which isn't a problem.
+	
+	Debating what to hit next.  Animations or xml parsing.  XML parsing and context checking will be the ultimate driver of the animation so 
+	I'll probably start that next.
+	
+	One other test once I get full context checking is subdirectories.  I want subdirectories for each item.  File structure is much cleaner that way.
+	However, the link checker will need to be cognicent of the context.	
+	
+8/20/2005
+	Shot down this time by FireFox... 
+	
+	Safe to say that when I *do* find a bug in Moz, the big is a real bitch.  God.. hours were chewed up by this one looking for ways around it.
+	The only alternative choice might be to restructure the subtopics where they are no longer linked into each other.  Changing that might be better, though 
+	it makes context checking a bit more tricky.
+	
+	Ended up with this gross-assed hack:
+	//Fix annoying assed mozilla glitch
+	if(client.userAgent.search(/gecko/) != -1) {
+		currLev.childNodes[2].style.left = parseInt(currLev.childNodes[1].offsetWidth) + 8 + "px";
+	}	
+	
+	Essentially since Moz has difficulty placing the right end of the subTopic bar when nested when created via DHTML I've had to manually/hardset it.
+	Not pretty at all, but I didn't have much choice and frankly this annoyance has eaten enough hours.
+
+	Done tonight:
+		* Fucked around for hours with Moz bug and got ugly work around
+		* Removed topicBar*DHTML ID selectors
+		* Changed CreateTopicBar function so that it now changes the position style to absolute
+		* Created directory structure and "framed out" a portion of the web site.
+		
+	To Do:
+		* Work on *Click functions so that they go through the XML fetcher
+		* XML Context Checking
+		* Bar Change
+		* Submenu Change
+		* SubTopic Add/Remove
+
+8/21/2005
+	Today's development efforts went a bit smoother than yesterday.. still not so sure what all is going to happen when it comes to the xml portion of 
+	detecting what subtitles are there.
+	
+	Done tonight:
+		* SubMenu expand/collapse animations - quite pleased with this so far - though I need to play with the collapse a tad more.
+		* ContentArea wipe - uuuh, not as pleased with this.  Might leave it as is since there's gonna be enough going around.  Site is to entertain, 
+		  not enduce seizures - although that might be fun...
+		* Added code to FetchContent() to prevent a double-request for the same document.
+		* Added FetchContent() calls to subMenus, and subTopics onClick handlers
+	
+	ToDo:
+		* XML Parsing and Context checking	 
+		* Bar Change
+		* Submenu Change
+		* SubTopic Add/Remove			
+	
+	Still unknown if the subMenu and subTopic creator functions are happy dining on XML - Moz will be happy but that's where IE might barf.
+			
+	XML Parsing needs to be at Ln 61 of xmlFunctions
+
+8/22/2005
+	Done tonight:
+		* Split Context for Moz and IE
+		* Renamed/clarified some functions
+		* Adjusted the xml location request so that the interface will know whether a request is being made for the same document.
+		* Basic Topic Bar detection
+		* TopicBarReturn() Completed/Roughed Out.
+			
+	ToDo:
+		* TopicBarPromote()
+		* Keep working on context checker to detect submenu and subtopic changes and remove/change if necessary.
+		* SubMenuRemove/Promote (hmm.. might change the name of that Promote part)
+		* SubTopicRemove/Promote (ditto)
+		
+	Need to still dink with SubMenu expansion/collapse - looks OK but it's not as good as it should be just yet.  What I have now will do for a placeholder.
+
+8/23/2005
+	Done tonight:
+		* TopicBarPromote() Completed/Roughed Out
+		* Changed SubTopicPromote to SubTopicAdd
+		* Changed SubMenuPromote to SubMenuAdd
+		* SubMenuRemove() Completed/Rouged Out
+		* SubMenuAdd() Completed/Rouged Out		
+	
+	ToDo:
+		* SubTopic Detection/adding/removing
+		* Context checker
+
+8/25/2005		
+	Done tonight:
+		* FetchContent Tweaked out a bit more to be more context sensitive
+	
+	ToDo: 
+		* Same crap as the 23rd
+		
+	Ended up burning the 24th on Culinary Arts poster work.  
+	
+	During the night here, my cable went out - thanks Comcast.. I love not having internet or tv...
+	
+	There is one silver lining and it would perhaps explain why IE is so fraggin slow - it also exposed a fact that if someone uses a CD(offline) version
+	of this site, it will not work.  Solution, store http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd locally and change all the tags in the top to
+	reference that.  Not sure whether that breaks xhtml-strict or not, one way to find out.
+	
+	Also tweaked TopicBarPromote a tad.	  And fixed a bug with IE's submenu generation.
+	
+	Now to focus on subtopics stuff.
+	
+8/26/2005
+	Done tonight:
+		* Link context checker for in content fixed
+		* Implemented link context checker on InitInterface.
+		* Dummy pages for subtopic nesting
+		* SubTopicRemove() Completed/Roughed Out
+		
+	Still working on figuring out the SubTopic scripts.  Quite the lovely challenge.
+	
+	It does turn out that for some stupid reason MS requests the DTD with every fucking XML request (!?). Ergo sum, no connection, no worky for IE.
+	Yeech!  Unless I find a workaround that is.  Still, a request back to the W3C for every last request?  That's nuts.  There has to be a workaround
+	but I'll explore that one after I get everything running.  Probably some cute content hack can do it.
+	
+	Right now the subTopic add/remove thing goes well enough - Think at this point, the next logical step should be deep traversal of the existing subTopic
+	tree and comparing.  When I find a .id != call set the remove pointer.  Trick is swaps.  I might end up having Remove call Add for sake of sequence.
+	Though if they are different subobjects, then it might be non-issue.
+	
+	SubTopicAdd will need to be wired in to check to see:
+		1. Whether it's the first one and if so get the barText offset (ala InitInterface).
+		2. Set left coods
+		3. Set top coords. 
+		
+	Either that or the xml functions can do so.  Having SubTopicAdd do it might make for a cleaner implementation.
+	
+8/27/2005
+	Ick.. the pain.  subtopic work was hell the first time and it's hell this time.  Almost got it working in FF.  God knows what that POS IE is gonna do to me.
+	I almost shudder to think.. Either way, Runnin' out of gas.
+	
+	One thing that seems to be giving it some grief yet is bar traversal + subtopic change.  That and I'm still having odd space issues w/FF.
+	
+8/28/2005
+	Got both Moz and IE "good" on subTopics.  Some of the code written to do so is up on my "works but not pretty" range.  But it does work, both browsers.
+	
+	ToDo:
+		* Rework subMenu anims
+		* dirContext tweaks (doesn't step back with ../);
+		* figure out why moz sometimes sticks two subtopic items close together.	
+		* IE has a bug when it starts on an inside page.
+		* Auto image URL correction
+		* Loading document sequence
+		* "Sparky"
+		* Fancy init sequence.
+		* FIX PRINT STYLESHEET
+		
+	Done: 
+		* subMenu anims reworked.
+		* IE bug squashed.
+		* dirContext tweaks in.
+		* added Body's OnResize handler
+		* auto image URL correction
+		* Ported in old content - did base-line cleanup to make it compliant - will need to then adjust the appearance of each page.
+		* Print style sheet mostly fixed - the subtopic placement is a little odd on both browsers.
+		
+	Still ToDo:
+		* Loading document sequence
+		* Tweak print stylesheet
+		* Fancy Init Sequence
+		* Content
+		* "Sparky"
+
+8/29/2005
+	Done:
+		* Loading document sequence
+		
+	Think next it's time to play with the fancy init sequence since that's the next big thing.  Did try moving the submenu and subtopic creation on initial
+	xhtml document access but in the end I've decided to leave well enough alone.  Either that or work on the "sparky".  I still need to create sparky's
+	graphics... thinking 4 sparks.  Might make more sense to do sparky first on thought...
+
+8/31/2005
+	Done:
+		* Sparky
+		
+	Not too bad, doesn't quite look the way I want it to but it's not bad.  Then again that's a little tricky to do anyway.
+	
+	Next up - the opening/init sequence.
+	
+	One last thing - on the static version of this site, the submenu tends to massively overlay the content.  Might need to make a cute div/span hack to 
+	skinny the content up to get it around the menu.  On my script, I'll need to disable that or make full width.  MarginRight might be the trick there.
+
+9/01/2005
+	Work starts on the fancy Init Sequence
+	
+	Just in case I've saved the old get it running one as OldInitInterface().  OldInitInterface was mainly designed to be a placeholder but I wanted to
+	keep it around since I'm not 100% sure if I'll still have to manually tweak stuff after it's all done.
+	
+	One thing that's vastly different this time around is the way the loading is being handled.  Previously it was more staged, but this site uses more
+	parts and pieces during the load sequence.  So from the get go I start it cooking loading all interface graphics.  Firing off the next sequence then
+	becomes a matter of checking to see if the part is loaded.  If not, it'll wait.  This is of course assuming that images will load fully in sequence!
+	
+	Unlike my original storyboards from last night, I had to do the circuitBG first - this is because everything is a child of it.  If it's clipped or 
+	hidden then it's children would be subject to that as well.  Not good.  No biggie - in a way the revised initsequence is more in line with the 
+	overall presentation.
+	
+	Next up SlideInContentPanel() - slide it in hot bump logo just a tad to the left.  Uh, hmm.. ick - going to have to temporarily displace the content
+	for part of this.
+	
+	Next phase will use setTimeout will wait until LoadCheckIn() indicates all images are loaded.  
+	
+9/02/2005
+	Done:
+		* Fancy Init Sequence!
+		
+	ToDo:
+		* Konq handing - close but not a jedi yet when it comes to XML
+		* SubMenu Content spacer - pretty minor hack - will need to detect/disable this whenever the submenu can be rolled up.
+		* Link handler to handle direct links to images - not sure what all to do here, definitely want to spawn a new window.
+		* Print Stylesheet tweaks/final.	
+		* Position resumption cookie/detection.
+		* CONTENT UPDATE (add XHTML Compliance badges)
+		
+	Did a way with the loadcheck functions - found a cute hack around it.  Need to now test this over a slower connection.  On this local box objects load
+	so fast I can't check for onload, I have to check for completed.
+	
+	So far I'm satisfied with init sequence.  Fancy but to the point.
+
+9/03/2005
+	Done:
+		* Added XHTML badges
+		* Tweaked the content fixer so it'll leave external images locations alone
+		* Position resumption (had to massively tweak FetchConfent)
+		* Link handler for images done!
+		* Konq Handling done
+		* SubMenu Content spacer
+		* Print Stylesheet working.
+							
+	Had to seriously tweak the FetchContent function - has an ugly hack or two to keep it from barfing on the home bar.  Given the mixed nature of the homes
+	content it's been a tad problematic throughout this.  Bar references root while all its content refereces the home dir.  
+	
+	One other issue encountered was the hard positioning of the selected topic bar.  No matter what I couldn't get the print stylesheet to override that in 
+	either browser.  Damned annoying.  Best bet - plan B - go with the flow.  The logo has been moved back over to the left.  I wanted it right justified
+	but I'll take what I can get.
+	
+	Content has been cleaned up a bit.  Looks pretty nice - have some float styles to take care of the images where previously tables were being used.
+
+	Had to make a special "break" div to act like the old BR CLEAR=ALL tags of yesteryear.  No biggie.
+	
+	Now comes the part of making one hella massive content update!
+	
+	ToDo:
+		* Add Destinations/Colorado/Mesa Verde
+		* Add Destinations/Colorado/Maroon Bells
+		* Replace Destinations/Colorado/Hanging Lake pictures
+		* Add Destinations/Arizona/* content/pictures
+		* Add Destinations/Star Wars/* content
+		* Remove subTopic test links
+		* Fix/Update main homepage content
+		* Update WebSites/Freelance Sites (New Sonodas, WCCC, ITP Site)
+		* Remove "employer sites" from Web Sites
+		* Consider adding Culinary Arts poster to Art Portfolio
+		* Update What's New
+		* Add FF logo to home page
+		* Link said FF logo to a "why FF" page.
+		* Link check
+		
+9/04/2005
+	Done:
+		* All content
+		
+	ToDo:
+		* Squish yet another critical bug with the content fetching system.
+		
+	Pretty much all the content is in - I had hoped to launch it tonight.  Oh well - still need to find some way to fix the damn home content area.  Might be
+	simpler to move those pages into the root and have them live there - it would fit more in the structure of the site really.
+	
+	Anyway, time for bed!
+
+9/05/2005 
+	
+	Fixed the bug - went ahead and moved the home content to be level with the bar.  Problem solved.  It's no big deal I suppose.		
+
+9/07/2005
+	Also fixed an annoying IE quirk.
+
+	Argh, think I found a little bug in moz.
+	1. Start on http://www.snydersweb.com/whatsNew.html
+	2. Click on a different bar
+	3. then go back to the home bar by clicking it - NOTHING.
+	
+	Later:
+	Damn my obsessive mind - fixed.  So much for leaving it lay til tomorrow... :-)
+	
+9/08/2005
+	Hardened the XML system against bad content and bad requests. Not it more gracefully handles things though that's not to say it's overly pretty... Regardless
+	it no longer has any form of interface crash/hang.  Moz doesn't seem happy calling the abort method of the xml object.  Not sure why. Keeps complaining about 
+	recursion.
+	
+	Unfortunately all functions need to be global - that scripts can only be included with the original page load.  That's consistent across both browsers.  
+	So for form validation, I have to include the validation functions as part of the general scripts.
+	
+	As far as actually transmitting the xml - that's a different problem.  Not sure what's the most effective thing to do.  I've seen some ideas that entail 
+	javascript xml data island that's altered and then transmitted.  That might work but it lacks a certian elegance - has to be a nicer way to do that.  The 
+	other problem is the dual function - submit if called in the dhtml interface using the XML system and if not do a simple stupid post.
+	
+	One other potential problem, dealing with odd characters subbmitted in the form.  Might need to escape them or something.
+	
+	In the mean time I've built a rudementary form and built the styles to match.
+	
+	An original backup copy of the contact me page is stored as "copy of" in the contact dir.
+	
+	The other thing is that this may need to be an absolute URL post when finished.
+	
+9/09/2005
+	Just completed XML form posting - interesting excercise.  The poster itself can be found in xmlFunctions.js as SendXML.  Very similar to GetExternalDocument 
+	except it adds a couple of minor things. 
+	
+	One minor quirk encountered - if you are accessing this site through the file protocol - it will not be able to post back to the form.  Probably a security 
+	mechanism there.  So, in the event they are doing it via file(for a cdrom distro) it will do a straight post directly to the parser via absolute URL.  If it
+	is going through HTTP* then it'll post through the XML object if it has it.
+	
+	A have also completed a basic PHP parse the form and send the email type thing.  Works well enough for now, but I need to harden it some against malicious folk
+	who are looking to use it to hack in.  To that end I've found this article that involves using PHP regular expressions:
+	http://www.onlamp.com/pub/a/php/2004/04/22/php_css_forms.html?page=2
+	
+	An another note on this - I tried orginally clearing the content panel right before getting the results back - bad. Caused Moz to crash instantly.  IE didn't
+	crash to its credit but still behaved in an odd way.  So the page just posts, no biggie since technically you're not leaving that page anyway.
+	
+	I think once I get the parser hardened this site could be considered more/less done outside of adding to the blog and dropping pictures in whenever I can.
+
+
+12/21/2006 - IE7...
+Polite words fail me.  I cant say enough how much I would love to print out IE7's code (in triplicate) and shove it right up the MS dev teams ass.
+When the overflow is hidden - IE7 for some bizaar reason fails to display accurate height and width attributes for the body.
+OK, plan B - use:
+			 this.width = document.body.offsetWidth;
+			 this.height = document.body.offsetHeight;
+CRASH!!!
+
+Yep - that, after having the rest of my site loads will cause IE7 to barf, consistently.  In short GRRRRRR!!  Least with the Mozilla team I was listened to and the bug I submitted taken serioiusly!  
+With MS, I feel like a gnat screaming at an elephant.
+
+Guess I'll just have to keep researching this issue as I get time.... A POX ON YOU MICROSOFT!!!!
+ 				
+</pre>
+
+
+</body>
+</html>

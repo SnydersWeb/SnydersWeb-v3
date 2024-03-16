@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/strict.dtd">
+<html xmlns="http://www.w3.org/TR/xhtml1">
+   <head>
+      <title>
+         Untitled
+      </title>
+      <style>
+        * { font-family: Arial, Verdana, Helvetica; font-size: 9pt; }
+        body { background-color: white; }
+        th { text-align: left; background-color: navy; color: white; }
+        td.subHead { font-weight: bold; color: navy }
+      </style>
+<script type="text/javascript" src="nczXMLDOMWrapper.js">
+</script>
+<script type="text/javascript">
+var objValidXMLFile;
+var objInvalidXMLFile;
+var objValidXMLString;
+
+        function doLoad() {
+            loadValidExternalXMLFile();
+            loadInvalidExternalXMLFile();
+            loadValidXMLString();
+            loadInvalidXMLString();
+        }
+        
+        
+        function loadValidExternalXMLFile() {
+            objValidXMLFile = jsXML.createDOMDocument();
+            objValidXMLFile.onreadystatechange = doLoad_ValidExternalXMLFile;
+            //objValidXMLFile.load("valid.xml");
+            objValidXMLFile.load("../home.xml");
+			
+        }
+
+        function loadInvalidExternalXMLFile() {
+            objInvalidXMLFile = jsXML.createDOMDocument();
+            objInvalidXMLFile.onreadystatechange = doLoad_InvalidExternalXMLFile;
+            objInvalidXMLFile.load("Invalid.xml");
+        }
+        
+        function loadValidXMLString() {
+            objValidXMLString = jsXML.createDOMDocument();
+            objValidXMLString.loadXML("<tree><root image=\"root.gif\">My Root</root></tree>");
+            
+            //need to format for printing
+            var reLT = /</g;
+            var reGT = />/g;
+            var reAmp = /&/g;
+            
+            var strXML = objValidXMLString.xml.replace(reAmp, "&amp;");
+            strXML = strXML.replace(reLT, "&lt;");
+            strXML = strXML.replace(reGT, "&gt;");
+            document.getElementById("tdValidXMLStringXML").innerHTML = strXML;
+            document.getElementById("tdValidXMLStringError").innerHTML = (objValidXMLString.parseError == 0 ? "No" : "Yes") + " (parseError = "  +objValidXMLString.parseError + ")";
+            document.getElementById("tdValidXMLStringReadyState").innerHTML = objValidXMLString.readyState;
+        }
+        
+        function loadInvalidXMLString() {
+            objInvalidXMLString = jsXML.createDOMDocument();
+            objInvalidXMLString.loadXML("<tree><root image=\"root.gif\">My Root</boot></tree>");
+            
+            //need to format for printing
+            var reLT = /</g;
+            var reGT = />/g;
+            var reAmp = /&/g;
+            
+            var strXML = objInvalidXMLString.xml.replace(reAmp, "&amp;");
+            strXML = strXML.replace(reLT, "&lt;");
+            strXML = strXML.replace(reGT, "&gt;");
+            document.getElementById("tdInvalidXMLStringXML").innerHTML = strXML;
+            document.getElementById("tdInvalidXMLStringError").innerHTML = (objInvalidXMLString.parseError == 0 ? "No" : "Yes") + " (parseError = "  +objInvalidXMLString.parseError + ")";
+            document.getElementById("tdInvalidXMLStringReadyState").innerHTML = objInvalidXMLString.readyState;
+        }
+
+ 
+        
+        function doLoad_ValidExternalXMLFile() {
+            if (objValidXMLFile.readyState == 4) {
+                //get timestamp of load completion
+                var objTimestamp = new Date();
+                
+                //need to format for printing
+                var reLT = /</g;
+                var reGT = />/g;
+                var reAmp = /&/g;
+                
+                var strXML = objValidXMLFile.xml.replace(reAmp, "&amp;");
+                strXML = strXML.replace(reLT, "&lt;");
+                strXML = strXML.replace(reGT, "&gt;");
+                document.getElementById("tdValidXMLFileXML").innerHTML = strXML;
+                document.getElementById("tdValidXMLFileTimeStamp").innerHTML = objTimestamp;
+                document.getElementById("tdValidXMLFileError").innerHTML = (objValidXMLFile.parseError == 0 ? "No" : "Yes") + " (parseError = "  +objValidXMLFile.parseError + ")";
+                document.getElementById("tdValidXMLFileReadyState").innerHTML = objValidXMLFile.readyState;
+                                
+            }
+        }
+        
+        function doLoad_InvalidExternalXMLFile() {
+            if (objInvalidXMLFile.readyState == 4) {
+                //get timestamp of load completion
+                var objTimestamp = new Date();
+                
+                //need to format for printing
+                var reLT = /</g;
+                var reGT = />/g;
+                var reAmp = /&/g;
+                
+                var strXML = objInvalidXMLFile.xml.replace(reAmp, "&amp;");
+                strXML = strXML.replace(reLT, "&lt;");
+                strXML = strXML.replace(reGT, "&gt;");
+                document.getElementById("tdInvalidXMLFileXML").innerHTML = strXML;
+                document.getElementById("tdInvalidXMLFileTimeStamp").innerHTML = objTimestamp;
+                document.getElementById("tdInvalidXMLFileError").innerHTML = (objInvalidXMLFile.parseError == 0 ? "No" : "Yes") + " (parseError = "  +objInvalidXMLFile.parseError + ")";
+                document.getElementById("tdInvalidXMLFileReadyState").innerHTML = objInvalidXMLFile.readyState;
+                                
+            }
+        }
+    
+</script>
+   </head>
+   <body onload="doLoad()">
+   <table border="1" width="100%">
+    <tr>
+        <th>Valid External XML File Test</th>
+    </tr>
+    <tr>
+        <td class="subHead">XML String:</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLFileXML"></td>
+    </tr>
+    <tr>
+        <td class="subHead">Finished Loading At:</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLFileTimeStamp"></td>
+    </tr>
+    <tr>
+        <td class="subHead">Error?</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLFileError"></td>
+    </tr>
+    <tr>
+        <td class="subHead">readyState</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLFileReadyState"></td>
+    </tr>
+   </table>
+<p>
+   <table border="1" width="100%">
+    <tr>
+        <th>Invalid External XML File Test</th>
+    </tr>
+    <tr>
+        <td class="subHead">XML String:</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLFileXML"></td>
+    </tr>
+    <tr>
+        <td class="subHead">Finished Loading At:</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLFileTimeStamp"></td>
+    </tr>
+    <tr>
+        <td class="subHead">Error?</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLFileError"></td>
+    </tr>
+    <tr>
+        <td class="subHead">readyState</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLFileReadyState"></td>
+    </tr>
+   </table>
+<p>
+   <table border="1" width="100%">
+    <tr>
+        <th>Valid XML String Test</th>
+    </tr>
+    <tr>
+        <td class="subHead">XML String:</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLStringXML"></td>
+    </tr>
+    </tr>
+    <tr>
+        <td class="subHead">Error?</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLStringError"></td>
+    </tr>
+    <tr>
+        <td class="subHead">readyState</td>
+    </tr>
+    <tr>
+        <td id="tdValidXMLStringReadyState"></td>
+    </tr>
+   </table>
+<p>
+   <table border="1" width="100%">
+    <tr>
+        <th>Invalid XML String Test</th>
+    </tr>
+    <tr>
+        <td class="subHead">XML String:</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLStringXML"></td>
+    </tr>
+    <tr>
+        <td class="subHead">Error?</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLStringError"></td>
+    </tr>
+    <tr>
+        <td class="subHead">readyState</td>
+    </tr>
+    <tr>
+        <td id="tdInvalidXMLStringReadyState"></td>
+    </tr>
+   </table>
+
+   </body>
+</html>
+

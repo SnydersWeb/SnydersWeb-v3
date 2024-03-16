@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta name="generator" content="PSPad editor, www.pspad.com">
+  <title></title>
+	<script type="text/javascript">
+/********* Begin WSDOM Common Code *********/
+
+/* Extend from another prototyped Function */
+Function.prototype.Extend = function(superClass) {
+	var myPrototype = this.prototype;
+	var myConstructor = this.prototype.constructor;
+
+  //Instantiate passed function name
+	myConstructor.prototype = new superClass();
+	myConstructor.prototype.constructor = myConstructor;
+
+	// both classes and instances should have references to their superClasses
+	myConstructor.prototype.getSuperClass = function() {
+		return superClass;
+	};
+	myConstructor.getSuperClass = myConstructor.prototype.getSuperClass;
+
+	return this;
+}
+
+
+/*
+The Super method allows us to do the constructor (or any super call) chaining more easily.  It looks like this:
+
+var A = function() {
+  this.value = ["1"]
+}
+
+var B = function() {
+  B.Super(this);
+  this.value.push("2");
+}
+
+Super calls for non constructor methods look like:
+Class.Super(this, "methodName", arguments);
+*/
+
+Function.prototype.Super = function(context, methodName, args)
+{
+  var method;
+  if(null != methodName){ 
+    method = this.getSuperClass().prototype[methodName]; 
+  } else { 
+    method = this.getSuperClass(); 
+  }
+  
+  var results;
+  if(!args){ 
+    results = method.call(context); 
+  } else { 
+    results = method.apply(context, args); 
+  }
+  
+  return results;
+}; 
+
+/********* Emd WSDOM Common Code *********/
+
+TestAnim = function() {
+  this.debug("TestAnim Contructor Called");
+  
+}
+
+TestAnim.prototype.init = function() {
+  this.debug("TestAnim Init Called");
+
+  //Other attributes
+  this.top = "0px";
+  this.left = "0px";
+  this.width = "100px";
+  this.height = "100px";
+  this.backgroundColor = "#f00";
+  this.timeOut = 0;
+  this.animDelay = 20;
+
+  /*
+  //IE
+  this.width = document.documentElement.clientWidth;
+  this.height = document.documentElement.clientHeight;
+	if(document.documentElement && document.documentElement.clientHeight) { //Newer IE
+    this.width = document.documentElement.clientWidth;
+    this.height = document.documentElement.clientHeight;
+	} else { //Legacy IE
+		this.width = document.body.clientWidth;
+ 		this.height = document.body.clientHeight;
+  }
+
+  //FF
+  this.width = window.innerWidth;
+  this.height = window.innerHeight;
+  */  
+  if(document.documentElement) {
+    this.browseWidth = document.body.clientWidth;
+  } else {
+    this.browseWidth = window.innerWidth;
+  }
+    
+  var testDiv = document.createElement("div");
+  testDiv.id = "testDiv";
+  testDiv.style.top = this.top;
+  testDiv.style.left = this.left;
+  testDiv.style.width = this.width;
+  testDiv.style.height = this.height;
+  testDiv.style.backgroundColor = this.backgroundColor;
+  testDiv.style.position = "absolute";
+  
+  document.body.appendChild(testDiv);
+  
+  //Event handler
+  this.initEvents();
+}
+
+/*
+function hitch (obj, meth) {
+	return function () {
+		return typeof meth == "function" ? meth.apply(obj, arguments) : obj[meth].apply(obj, arguments);
+	};
+};
+*/
+
+TestAnim.prototype.initEvents = function() {
+  this.debug("TestAnim InitEvents Called");
+  
+  var testDiv = document.getElementById("testDiv");
+  var self = this;
+
+  if(document.attachEvent) { //IE
+    //testDiv.attachEvent("click", hitch(this, this.eventClick), true);
+    testDiv.attachEvent("onclick", function() {self.eventClick.call(self, arguments)});
+  } else if(document.addEventListener) { //
+    //testDiv.addEventListener("click", hitch(this, this.eventClick), true);
+    testDiv.addEventListener("click", function() {self.eventClick.call(self, arguments)}, true);
+  }
+    
+}
+
+TestAnim.prototype.eventClick = function() {
+  this.debug("TestAnim eventClick Called");
+  
+  var self = this;
+  
+  this.timeOut = setTimeout(function() {self.moveItRight()}, this.animDelay);
+  
+}
+
+TestAnim.prototype.moveItRight = function() {
+  this.debug("TestAnim moveIt Called");
+  
+  var testDiv = document.getElementById("testDiv");
+  var leftPos = parseInt(testDiv.style.left);
+  var leftAdj = parseInt((this.browseWidth - leftPos)/2);
+  var newLeftPos = leftPos + ((leftAdj > 1) ? leftAdj : 1);
+  var self = this;
+  this.debug("Move:" + leftPos + " width:" + this.browseWidth);
+
+  if(leftPos < this.browseWidth) {
+    this.debug("Move:" + leftPos + " width:" + this.browseWidth);
+    testDiv.style.left = newLeftPos + "px";
+    this.timeOut = setTimeout(function() {self.moveItRight()}, this.animDelay);
+  } else {
+    testDiv.style.left = this.browseWidth + "px";
+  }
+
+}
+
+TestAnim.prototype.debug = function(message) {
+  if(window.console) {
+    //console.info(message);
+  } else {
+    //alert(message);
+  }
+}
+
+
+  
+//Initialize object.
+window.onload = function() {
+  var testAnim = new TestAnim();
+  testAnim.init();
+}
+  
+  
+  </script>
+  </head>
+  <body>
+  
+  
+
+  </body>
+</html>

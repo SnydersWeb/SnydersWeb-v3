@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!-- All scripts and graphics on this website (c) 2005 David Snyder -->
+<head>
+	<title>Snyders Web</title>
+
+	<link rel="icon" href="favicon.ico" />
+	<link rel="SHORTCUT ICON" href="favicon.ico" />
+	
+</head>
+
+<script type="text/javascript">
+var fetchedDoc = null;
+
+function loadXML2(url) {
+	//load xml file
+	if (document.implementation && document.implementation.createDocument) {
+		//Create new Document object
+		try {
+			var xmlDoc = document.implementation.createDocument(null, "", null);
+		} catch(e) {
+			alert(e);
+		}
+		//Specify what should happen when it finishes loading.
+		xmlDoc.onload = function() { alert("loaded!"); }
+		//Load the document
+		xmlDoc.load(url);
+	} else if (window.ActiveXObject) { //IE
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc.onreadystatechange = function() { if (xmlDoc.readyState == 4) alert("loaded!"); }
+		//xmlDoc.async = false; //Enforce download of XML file first. IE only.
+		xmlDoc.load(url);
+	}
+	
+	fetchedDoc = xmlDoc;
+	
+}
+
+function loadXML(url, handler) {
+	//load xml file
+	if (document.implementation && document.implementation.createDocument) {
+		//Create new Document object
+		var xmlDoc = document.implementation.createDocument("", "", null);
+		//Specify what should happen when it finishes loading.
+		xmlDoc.onload = function() { handler(xmlDoc, url); }
+		//Load the document
+		xmlDoc.load(url);
+	} else if (window.ActiveXObject) { //IE
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc.onreadystatechange = function() { if (xmlDoc.readyState == 4) handler(xmlDoc, url); }
+		//xmlDoc.async = false; //Enforce download of XML file first. IE only.
+		xmlDoc.load(url);
+	}
+	
+}
+
+// This function builds an HTML table of employees from data it reads from
+// the XML document it is passed
+function makeTable(xmldoc, url) {
+    // Create a <table> object and insert it into the document
+    var table = document.createElement("table");
+    table.setAttribute("border", "1");
+    document.body.appendChild(table);
+ 
+    // Use convenience methods of HTMLTableElement and related interfaces
+    // to define a table caption and a header that gives a name to each column
+    var caption = "Employee Data from " + url;
+    table.createCaption(  ).appendChild(document.createTextNode(caption));
+    var header = table.createTHead(  );
+    var headerrow = header.insertRow(0);
+    headerrow.insertCell(0).appendChild(document.createTextNode("Name"));
+    headerrow.insertCell(1).appendChild(document.createTextNode("Job"));
+    headerrow.insertCell(2).appendChild(document.createTextNode("Salary"));
+    
+    // Now find all <employee> elements in our xmldoc document
+    var employees = xmldoc.getElementsByTagName("employee");
+ 
+    // Loop through these <employee> elements
+    for(var i = 0; i < employees.length; i++) {
+        // For each employee, get name, job, and salary data using standard DOM
+        // methods. The name comes from an attribute. The other values are
+        // in Text nodes within <job> and <salary> tags.
+        var e = employees[i];
+        var name = e.getAttribute("name");
+        var job = e.getElementsByTagName("job")[0].firstChild.data;
+        var salary = e.getElementsByTagName("salary")[0].firstChild.data;
+ 
+        // Now that we have the employee data, use methods of the table to
+        // create a new row and then use the methods of the row to create
+        // new cells containing the data as Text nodes
+        var row = table.insertRow(i+1);
+        row.insertCell(0).appendChild(document.createTextNode(name));
+        row.insertCell(1).appendChild(document.createTextNode(job));
+        row.insertCell(2).appendChild(document.createTextNode(salary));
+    }
+}
+
+function AlertVal() {
+	alert(fetchedDoc.childNodes.length);
+}
+
+</script>
+<body onload="loadXML(location.search.substring(1), makeTable)">
+
+
+<div id="container"></div>
+
+<a href="JavaScript:loadXML2('home.html')">Load it!</a><br>
+<a href="JavaScript:AlertVal()">Test it!</a>
+
+
+</body>
+</html>
